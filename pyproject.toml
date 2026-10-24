@@ -2,18 +2,9 @@
 [project]
 name = "robodoctor"
 version = "0.1.0"
-description = "RAG-powered robotics troubleshooting assistant"
+description = "Robotics troubleshooting assistant"
 requires-python = ">=3.11"
 dependencies = [
-    "streamlit",
+    "cleanpy>=0.5.1",
     "ollama",
-    "sentence-transformers",
 ]
-
-[dependency-groups]
-dev = [
-    "pytest",
-]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
