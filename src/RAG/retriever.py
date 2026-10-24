@@ -1,11 +1,25 @@
-from pathlib import Path
 import re
+from pathlib import Path
+
+STOPWORDS = {
+    "the", "is", "a", "an", "my", "it", "by", "and", "of", "to", "in", "on",
+    "at", "for", "with", "does", "do", "not", "doesnt", "dont", "this", "that",
+    "i", "me", "but", "or", "are", "was", "be", "have", "has", "when", "so",
+}
+
+
+def tokenize(text: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9]+", text.lower()))
 
 
 class Retriever:
-    def __init__(self, data_dir: str = "data") -> None:
-        self.data_dir = Path(data_dir)
-        self.chunks: list[dict[str, str]] = []
+    def __init__(self, data_dir: str | Path | None = None) -> None:
+        self.data_dir = (
+            Path(data_dir)
+            if data_dir is not None
+            else Path(__file__).resolve().parents[2] / "robodoctor_docs" / "data"
+        )
+        self.chunks: list[dict] = []
         self.load_documents()
 
     def load_documents(self) -> None:
@@ -18,24 +32,19 @@ class Retriever:
                     self.chunks.append({
                         "source": path.name,
                         "content": section,
+                        "tokens": tokenize(section),  # computed once, not per query
                     })
 
-    def search(self, query: str) -> list[dict[str, str]]:
-        words = set(re.findall(r"\b[a-z0-9]+\b", query.lower()))
-        ignored = {"the", "is", "a", "an", "my", "it", "by", "and"}
-        words -= ignored
+    def search(self, query: str, k: int = 3) -> list[dict[str, str]]:
+        words = tokenize(query) - STOPWORDS
+        if not words:
+            return []
 
-        results = []
+        scored = [(len(words & chunk["tokens"]), chunk) for chunk in self.chunks]
+        scored = [(score, chunk) for score, chunk in scored if score > 0]
+        scored.sort(key=lambda item: item[0], reverse=True)
 
-        for chunk in self.chunks:
-            content = chunk["content"].lower()
-            score = sum(
-                word in set(re.findall(r"\b[a-z0-9]+\b", content))
-                for word in words
-            )
-
-            if score > 0:
-                results.append((score, chunk))
-
-        results.sort(key=lambda item: item[0], reverse=True)
-        return [chunk for _, chunk in results[:3]]
+        return [
+            {"source": chunk["source"], "content": chunk["content"]}
+            for _, chunk in scored[:k]
+        ]

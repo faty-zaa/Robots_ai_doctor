@@ -1,39 +1,27 @@
 
-UV       = uv
-PYTHON   = python
-SRC      = src
-MAIN     = main.py
-TESTS    = tests
+.PHONY: install run model check clean help
 
-.PHONY: install run check lint format test clean help
+UV = uv
 
 install:
-	@$(UV) sync ||  true
+	@$(UV) sync
+
+model:
+	ollama pull gemma3:4b
 
 run:
-	@$(UV) run $(PYTHON) $(MAIN) ||  true
+	@$(UV) run python -m src.ui
 
 check:
-	@$(UV) run mypy $(SRC) $(MAIN) ||  true
-
-lint:
-	@$(UV) run flake8 $(SRC) $(MAIN) ||  true
-
-format:
-	@$(UV) run black $(SRC) $(MAIN) ||  true
-
-test:
-	@$(UV) run pytest $(TESTS) ||  true
+	@$(UV) run python -m compileall -q src
 
 clean:
-	@cleanpy . || true
+	@cleanpy .
 
 help:
-	@echo "Available commands:"
-	@echo "  make install  - Install project dependencies"
-	@echo "  make run      - Run RoboDoctor"
-	@echo "  make check    - Run mypy type checking"
-	@echo "  make lint     - Run flake8 linting"
-	@echo "  make format   - Format code with Black"
-	@echo "  make test     - Run tests"
-	@echo "  make clean    - Remove generated cache files"
+	@echo "RoboDoctor - Available commands:"
+	@echo "  make install  - Install dependencies"
+	@echo "  make model    - Download the Ollama model"
+	@echo "  make run      - Launch the application"
+	@echo "  make check    - Check Python syntax"
+	@echo "  make clean    - Clean Python cache files"
