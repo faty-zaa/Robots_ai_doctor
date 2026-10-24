@@ -10,7 +10,7 @@ model:
 	ollama pull gemma3:4b
 
 run:
-	@$(UV) run python -m src.ui
+	@$(UV) run python3 web.py
 
 check:
 	@$(UV) run python -m compileall -q src
