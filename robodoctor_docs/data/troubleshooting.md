@@ -45,6 +45,26 @@ Do not diagnose battery health from voltage alone; use the official limits for t
 
 The official FAQ documents a model-specific DYNAMIXEL setup procedure using OpenCR. Follow it for the exact model; do not guess motor IDs, baud rates, or firmware.
 
+## Robot Starts or Turns On Unexpectedly
+
+### Symptoms
+- The robot powers on without an expected command.
+- The robot starts moving unexpectedly.
+
+### Possible Causes
+- An automatic startup script or scheduled process.
+- A remote-control command.
+- A faulty power switch or electrical circuit.
+- A control-system configuration issue.
+
+### Recommended Checks
+1. Check the power switch and wiring.
+2. Inspect startup scripts and automatic launch settings.
+3. Check remote-control commands and logs.
+4. If the robot moves unexpectedly, stop it safely and disconnect power if safe to do so.
+5. Do not assume the cause until the hardware and software have been inspected.
+
+
 ## Sources
 
 - Basic Operation: https://emanual.robotis.com/docs/en/platform/turtlebot3/basic_operation/
